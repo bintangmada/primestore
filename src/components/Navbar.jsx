@@ -7,7 +7,7 @@ import './Navbar.css';
 
 const Navbar = () => {
   const { cart } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
@@ -28,7 +28,20 @@ const Navbar = () => {
             <Search size={22} />
           </Link>
           <Link to={isAuthenticated ? "/profile" : "/login"} className="icon-btn desktop-only" aria-label="Account">
-            <User size={22} />
+            {isAuthenticated && user?.avatar ? (
+              <img 
+                src={user.avatar} 
+                alt="Profile" 
+                className="nav-avatar" 
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`;
+                }}
+              />
+            ) : (
+              <User size={22} />
+            )}
           </Link>
           <Link to="/cart" className="icon-btn cart-btn desktop-only" aria-label="Cart">
             <ShoppingCart size={22} />

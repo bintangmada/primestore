@@ -29,7 +29,9 @@ const ProductDetail = () => {
   }, [id]);
 
   const handleAddToCart = () => {
-    addToCart(product);
+    if (product) {
+      addToCart(product);
+    }
   };
 
   const getCleanImages = (images) => {
@@ -37,8 +39,33 @@ const ProductDetail = () => {
     return images.map(img => typeof img === 'string' ? img.replace(/["\[\]]/g, '') : img);
   };
 
-  if (loading) return <div style={{textAlign: 'center', padding: '4rem'}}>Loading product details...</div>;
-  if (!product) return <div style={{textAlign: 'center', padding: '4rem'}}>Product not found.</div>;
+  const getCategoryName = (category) => {
+    if (!category) return 'General';
+    const coreNames = {
+      1: 'Clothes',
+      2: 'Electronics',
+      3: 'Furniture',
+      4: 'Shoes',
+      5: 'Miscellaneous'
+    };
+    return coreNames[category.id] || category.name;
+  };
+
+  if (loading) {
+    return <div style={{textAlign: 'center', padding: '8rem 2rem'}}>
+      <div className="spinner" style={{margin: '0 auto 1rem'}}></div>
+      <p>Loading product details...</p>
+    </div>;
+  }
+
+  if (!product) {
+    return <div style={{textAlign: 'center', padding: '8rem 2rem'}}>
+      <h2>Product not found</h2>
+      <button className="btn-primary" onClick={() => navigate('/products')} style={{marginTop: '1rem'}}>
+        Back to Shop
+      </button>
+    </div>;
+  }
 
   const images = getCleanImages(product.images);
 
@@ -74,7 +101,7 @@ const ProductDetail = () => {
         </div>
 
         <div className="product-info-detail">
-          <div className="product-category-badge">{product.category?.name}</div>
+          <div className="product-category-badge">{getCategoryName(product.category)}</div>
           <h1 className="detail-title">{product.title}</h1>
           <p className="detail-price">${product.price}</p>
           <div className="detail-description">

@@ -1,5 +1,5 @@
 .product-detail-page {
-  padding: 1.5rem 0 6rem;
+  padding: 1.5rem 0 15rem; /* Increased padding */
 }
 
 @media (min-width: 768px) {
@@ -27,7 +27,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 10rem; /* Added huge bottom padding to the container itself */
   border-radius: 16px;
 }
 
@@ -135,9 +135,9 @@
 }
 
 .detail-description {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.8;
   font-size: 0.95rem;
 }
 
@@ -147,18 +147,19 @@
 
 .detail-description h3 {
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
 }
 
 .detail-action-bar {
   position: fixed;
-  bottom: 60px; /* above bottom nav */
+  bottom: 60px;
   left: 0;
   width: 100%;
-  padding: 1rem;
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid var(--border-color);
+  padding: 1.25rem 1.5rem 2rem;
+  background: #0f172a; /* Solid Navy */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -20px 40px rgba(0,0,0,0.6);
   z-index: 999;
 }
 
@@ -169,12 +170,14 @@
     border: none;
     padding: 0;
     margin-top: auto;
-    backdrop-filter: none;
+    box-shadow: none;
   }
 }
 
 .detail-add-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 1.1rem;
   font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 14px;
 }

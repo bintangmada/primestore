@@ -7,7 +7,7 @@ import './BottomNav.css';
 
 const BottomNav = () => {
   const { cart } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
@@ -28,7 +28,20 @@ const BottomNav = () => {
         <span>Cart</span>
       </NavLink>
       <NavLink to={isAuthenticated ? "/profile" : "/login"} className={({isActive}) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <User size={24} />
+        {isAuthenticated && user?.avatar ? (
+          <img 
+            src={user.avatar} 
+            alt="Profile" 
+            className="bottom-nav-avatar" 
+            crossOrigin="anonymous"
+            onError={(e) => {
+              e.target.onerror = null; 
+              e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`;
+            }}
+          />
+        ) : (
+          <User size={24} />
+        )}
         <span>{isAuthenticated ? 'Profile' : 'Login'}</span>
       </NavLink>
     </nav>

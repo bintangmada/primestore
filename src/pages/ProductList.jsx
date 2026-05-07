@@ -65,7 +65,7 @@ const ProductList = () => {
       const currentOffset = append ? offset + LIMIT : 0;
       
       const params = {
-        limit: LIMIT,
+        limit: 50, // Fetch more than LIMIT to allow for filtering junk
         offset: currentOffset,
       };
       
@@ -76,14 +76,60 @@ const ProductList = () => {
 
       const data = await getProducts(params);
       
+      // Sanitasi data "sampah"
+      const sanitizedData = data.filter(product => {
+        const title = product.title.toLowerCase();
+        const catId = product.category?.id;
+        const catName = (product.category?.name || '').toLowerCase();
+        
+        // Filter keyword sampah
+        // Jangan filter kategori inti (1-5) meskipun namanya diubah orang lain di API publik
+        const isCoreCategory = [1, 2, 3, 4, 5].includes(catId);
+        const isSpamCategory = !isCoreCategory && (catName.includes('qa') || catName.includes('test') || catName.includes('updated category'));
+
+        const isSpam = title.length < 3 || 
+                       title.includes('test') || 
+                       title.includes('prueba') || 
+                       title.includes('qa') || 
+                       title.includes('dummy') ||
+                       title.includes('automatizada') ||
+                       title.includes('palitra') ||
+                       title.includes('product_') ||
+                       title.includes('example') ||
+                       title.includes('asdf') ||
+                       title.includes('reloj') || 
+                       title.includes('jdojdo') || 
+                       title.includes('prjsui') || 
+                       isSpamCategory ||
+                       /^\d+$/.test(title) || 
+                       product.price > 10000;
+        
+        // Filter gambar placeholder
+        const hasValidImage = product.images && 
+                              product.images.length > 0 && 
+                              !product.images[0].includes('placeimg.com') &&
+                              !product.images[0].includes('600/400') &&
+                              !product.images[0].includes('600x400') &&
+                              !product.images[0].includes('imgur.com/600x400') &&
+                              !product.images[0].includes('via.placeholder');
+        
+        return !isSpam && hasValidImage;
+      }).slice(0, LIMIT);
+
       if (append) {
-        setProducts(prev => [...prev, ...data]);
+        setProducts(prev => {
+          // Gabungkan dan buang duplikat berdasarkan ID
+          const existingIds = new Set(prev.map(p => p.id));
+          const uniqueNewData = sanitizedData.filter(p => !existingIds.has(p.id));
+          return [...prev, ...uniqueNewData];
+        });
+        setOffset(currentOffset);
       } else {
-        setProducts(data);
+        setProducts(sanitizedData);
+        setOffset(0);
       }
       
-      setOffset(currentOffset);
-      setHasMore(data.length === LIMIT); 
+      setHasMore(data.length >= LIMIT);
       
       const newParams = new URLSearchParams();
       Object.entries(currentFilters).forEach(([key, value]) => {
@@ -92,11 +138,32 @@ const ProductList = () => {
       setSearchParams(newParams);
 
     } catch (error) {
-      console.error("Failed to fetch products", error);
+      console.error('Error fetching products:', error);
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
+  };
+
+  const getImageUrl = (images) => {
+    if (!images || images.length === 0) return 'https://via.placeholder.com/300?text=No+Image';
+    const url = images[0];
+    if (typeof url === 'string') {
+        return url.replace(/["\[\]]/g, '');
+    }
+    return url;
+  }
+
+  const getCategoryName = (category) => {
+    if (!category) return 'General';
+    const coreNames = {
+      1: 'Clothes',
+      2: 'Electronics',
+      3: 'Furniture',
+      4: 'Shoes',
+      5: 'Miscellaneous'
+    };
+    return coreNames[category.id] || category.name;
   };
 
   const handleFilterChange = (e) => {
@@ -110,19 +177,23 @@ const ProductList = () => {
     showNotification(`${product.title} added to cart!`, 'success');
   };
 
-  const getImageUrl = (images) => {
-    if (!images || images.length === 0) return 'https://via.placeholder.com/300?text=No+Image';
-    const url = images[0];
-    if (typeof url === 'string') {
-        return url.replace(/["\[\]]/g, '');
-    }
-    return url;
-  }
+  const observer = useRef();
+  const lastProductRef = (node) => {
+    if (loading || loadingMore) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        fetchProducts(true);
+      }
+    });
+    if (node) observer.current.observe(node);
+  };
 
   return (
     <div className="product-list-page animate-fade-in">
-      {/* Filter Section */}
+      {/* ... Filter Section ... */}
       <div className="filters-section glass">
+        {/* ... Search Bar ... */}
         <div className="search-bar">
           <input 
             ref={searchInputRef}
@@ -164,49 +235,66 @@ const ProductList = () => {
       </div>
 
       {loading ? (
-        <div style={{textAlign: 'center', padding: '2rem'}}>Loading products...</div>
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Loading products...</p>
+        </div>
       ) : (
         <>
           {products.length === 0 ? (
-            <div style={{textAlign: 'center', padding: '3rem'}}>No products found matching your criteria.</div>
+            <div className="no-results-container">
+              <div className="glass card no-results">
+                <h2>No products found</h2>
+                <p>Try adjusting your search or filters to find what you're looking for.</p>
+              </div>
+            </div>
           ) : (
             <div className="products-grid">
-              {products.map((product) => (
-                <Link to={`/products/${product.id}`} key={product.id} className="product-card glass">
-                  <div className="product-image-container">
-                    <img 
-                      src={getImageUrl(product.images)} 
-                      alt={product.title} 
-                      className="product-image"
-                      onError={(e) => { e.target.src = 'https://via.placeholder.com/300?text=Image+Error' }}
-                    />
-                  </div>
-                  <div className="product-info">
-                    <h3 className="product-title">{product.title}</h3>
-                    <p className="product-price">${product.price}</p>
-                    <button 
-                      className="btn-primary add-to-cart-btn"
-                      onClick={(e) => handleAddToCart(e, product)}
-                    >
-                      Add to Cart
-                    </button>
-                  </div>
-                </Link>
-              ))}
+              {products.map((product, index) => {
+                const isLast = products.length === index + 1;
+                return (
+                  <Link 
+                    to={`/products/${product.id}`} 
+                    key={product.id} 
+                    className="product-card glass"
+                    ref={isLast ? lastProductRef : null}
+                  >
+                    <div className="product-image-container">
+                      <img 
+                        src={getImageUrl(product.images)} 
+                        alt={product.title} 
+                        className="product-image"
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/300?text=Image+Error' }}
+                      />
+                    </div>
+                    <div className="product-info">
+                      <span className="product-category">{getCategoryName(product.category)}</span>
+                      <h3 className="product-title">{product.title}</h3>
+                      <p className="product-price">${product.price}</p>
+                      <button 
+                        className="btn-primary add-to-cart-btn"
+                        onClick={(e) => handleAddToCart(e, product)}
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
 
-          {hasMore && products.length > 0 && (
-            <div className="load-more-container">
-              <button 
-                className="btn-outline load-more-btn" 
-                onClick={() => fetchProducts(true)}
-                disabled={loadingMore}
-              >
-                {loadingMore ? 'Loading...' : 'Load More'}
-              </button>
-            </div>
-          )}
+          <div className="load-more-container">
+            {loadingMore && (
+              <div className="spinner mini"></div>
+            )}
+            {!hasMore && products.length > 0 && (
+              <div className="end-message animate-fade-in">
+                <div className="end-line"></div>
+                <span>You've reached the end of our collection</span>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>

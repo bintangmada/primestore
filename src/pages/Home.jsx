@@ -1,29 +1,48 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, Sparkles, Zap, ShieldCheck } from 'lucide-react';
 import './Home.css';
 
 const Home = () => {
-  // Kita gunakan kategori bawaan yang bersih agar tidak kena spam dari API publik
   const categories = [
-    { id: 1, name: 'Clothes', image: 'https://i.imgur.com/QkIa5tT.jpeg' },
-    { id: 2, name: 'Electronics', image: 'https://i.imgur.com/ZANVnHE.jpeg' },
-    { id: 3, name: 'Furniture', image: 'https://i.imgur.com/Qphac99.jpeg' },
-    { id: 4, name: 'Shoes', image: 'https://i.imgur.com/qNOjJje.jpeg' },
-    { id: 5, name: 'Miscellaneous', image: 'https://i.imgur.com/BG8J0Fj.jpg' }
+    { id: 1, name: 'Clothes', image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=400' },
+    { id: 2, name: 'Electronics', image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=400' },
+    { id: 3, name: 'Furniture', image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=400' },
+    { id: 4, name: 'Shoes', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400' },
+    { id: 5, name: 'Miscellaneous', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400' }
   ];
 
   return (
     <div className="home-page animate-fade-in">
       {/* Hero Section */}
-      <section className="hero-section glass">
+      <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">Discover the Extraordinary</h1>
+          <div className="hero-badge glass">
+            <Sparkles size={14} className="icon-gold" />
+            <span>New Season Collection 2026</span>
+          </div>
+          <h1 className="hero-title">Elevate Your Lifestyle</h1>
           <p className="hero-subtitle">
-            Premium goods for your modern lifestyle. Handpicked quality delivered to your door.
+            Experience the perfect blend of luxury and functionality with our handpicked premium collections.
           </p>
-          <Link to="/products" className="btn-primary">
-            Shop Now
-          </Link>
+          <div className="hero-actions">
+            <Link to="/products" className="btn-primary hero-btn">
+              Explore Shop
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Badges */}
+      <section className="trust-badges">
+        <div className="badge-item">
+          <Zap size={20} className="accent-color" />
+          <span>Fast Delivery</span>
+        </div>
+        <div className="badge-item">
+          <ShieldCheck size={20} className="accent-color" />
+          <span>Secure Payment</span>
         </div>
       </section>
 
@@ -35,7 +54,7 @@ const Home = () => {
             <Link 
               to={`/products?categoryId=${category.id}`} 
               key={category.id} 
-              className="category-card glass"
+              className="category-card"
             >
               <img src={category.image} alt={category.name} className="category-image" />
               <div className="category-overlay">
@@ -46,11 +65,17 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Section placeholder */}
-      <section className="featured-section" style={{marginTop: '3rem'}}>
-        <h2 className="section-title">Featured Collections</h2>
-        <div className="glass" style={{padding: '2rem', borderRadius: '20px', textAlign: 'center'}}>
-          <p style={{color: 'var(--text-secondary)'}}>Summer Collection 2026 is coming soon!</p>
+      {/* Featured Banner */}
+      <section className="featured-section">
+        <div className="featured-card new-arrival glass">
+          <div className="featured-info">
+            <h2 className="section-title" style={{border: 'none', padding: 0}}>Special Offer</h2>
+            <h3>Up to 40% Off</h3>
+            <p>On selected premium electronics. Limited time only.</p>
+            <Link to="/products?categoryId=2" className="btn-outline" style={{marginTop: '1rem', width: 'fit-content'}}>
+              View Deals
+            </Link>
+          </div>
         </div>
       </section>
     </div>

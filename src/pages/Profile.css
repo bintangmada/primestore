@@ -18,6 +18,7 @@
 }
 
 .profile-avatar-container {
+  position: relative;
   width: 100px;
   height: 100px;
   border-radius: 50%;
@@ -32,6 +33,28 @@
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--surface-color);
+}
+
+.edit-avatar-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--accent-primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--surface-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: var(--transition-fast);
+}
+
+.edit-avatar-btn:hover {
+  transform: scale(1.1);
+  background: var(--accent-secondary);
 }
 
 .profile-name {
@@ -89,7 +112,61 @@
   border-color: rgba(255, 77, 77, 0.2);
 }
 
-.logout-btn:hover {
-  background: rgba(255, 77, 77, 0.1);
-  border-color: #ff4d4d;
+.avatar-edit-form {
+  padding: 0.5rem 0;
+}
+
+.upload-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.upload-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  overflow: hidden;
+}
+
+.upload-placeholder:hover {
+  border-color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.avatar-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.divider::before, .divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.url-section label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
 }
