@@ -55,6 +55,20 @@ const useAuthStore = create(
 
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });
+      },
+
+      updateAvatar: async (avatarUrl) => {
+        const { user } = get();
+        if (!user) return;
+
+        try {
+          const response = await api.put(`/users/${user.id}`, { avatar: avatarUrl });
+          set({ user: response.data });
+          return true;
+        } catch (error) {
+          console.error('Update avatar failed:', error);
+          throw error;
+        }
       }
     }),
     {

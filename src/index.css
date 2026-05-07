@@ -173,3 +173,18 @@ button {
 .animate-fade-in {
   animation: fadeIn 0.4s ease forwards;
 }
+
+/* User Avatars in Nav */
+.nav-avatar, .bottom-nav-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--accent-primary);
+}
+
+.bottom-nav-avatar {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 2px;
+}
