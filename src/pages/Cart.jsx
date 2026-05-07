@@ -1,13 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingCart } from 'lucide-react';
 import useCartStore from '../store/useCartStore';
+import useAuthStore from '../store/useAuthStore';
+import useNotificationStore from '../store/useNotificationStore';
 import './Cart.css';
 
 const Cart = () => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
+  const { showNotification } = useNotificationStore();
+  const navigate = useNavigate();
 
   const totalAmount = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      showNotification('You need to login first to proceed to checkout!', 'warning');
+      navigate('/login');
+    } else {
+      showNotification('Checkout successful! Thank you for shopping.', 'success');
+      clearCart();
+    }
+  };
 
   const getImageUrl = (images) => {
     if (!images || images.length === 0) return 'https://via.placeholder.com/150';
@@ -72,7 +87,7 @@ const Cart = () => {
             <span>Total</span>
             <span>${totalAmount}</span>
           </div>
-          <button className="btn-primary checkout-btn">Proceed to Checkout</button>
+          <button className="btn-primary checkout-btn" onClick={handleCheckout}>Proceed to Checkout</button>
         </div>
       </div>
     </div>

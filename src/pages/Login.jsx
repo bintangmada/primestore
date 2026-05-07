@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+import useAuthStore from '../store/useAuthStore';
 import './Login.css';
 
 const Login = () => {
@@ -8,6 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('changeme');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { login } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -16,11 +17,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('https://api.escuelajs.co/api/v1/auth/login', {
-        email,
-        password
-      });
-      localStorage.setItem('access_token', response.data.access_token);
+      await login(email, password);
       navigate('/');
     } catch (err) {
       setError('Invalid email or password. Try john@mail.com / changeme');
@@ -65,7 +62,7 @@ const Login = () => {
         </form>
 
         <p className="login-footer">
-          Don't have an account? <a href="#">Create one</a>
+          Don't have an account? <Link to="/register">Create one</Link>
         </p>
       </div>
     </div>

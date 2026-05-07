@@ -2,10 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, LayoutGrid, ShoppingCart, User } from 'lucide-react';
 import useCartStore from '../store/useCartStore';
+import useAuthStore from '../store/useAuthStore';
 import './BottomNav.css';
 
 const BottomNav = () => {
   const { cart } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
@@ -25,9 +27,9 @@ const BottomNav = () => {
         </div>
         <span>Cart</span>
       </NavLink>
-      <NavLink to="/login" className={({isActive}) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+      <NavLink to={isAuthenticated ? "/profile" : "/login"} className={({isActive}) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <User size={24} />
-        <span>Profile</span>
+        <span>{isAuthenticated ? 'Profile' : 'Login'}</span>
       </NavLink>
     </nav>
   );
