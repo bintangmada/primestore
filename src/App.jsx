@@ -7,10 +7,14 @@ import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
+import Notification from './components/Notification';
 
 function App() {
   return (
     <div className="page-wrapper">
+      <Notification />
       <Navbar />
       <main className="container">
         <Routes>
@@ -19,6 +23,8 @@ function App() {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </main>
       <BottomNav />

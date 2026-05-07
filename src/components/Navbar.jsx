@@ -2,10 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, User, Search } from 'lucide-react';
 import useCartStore from '../store/useCartStore';
+import useAuthStore from '../store/useAuthStore';
 import './Navbar.css';
 
 const Navbar = () => {
   const { cart } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
@@ -22,10 +24,10 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-actions">
-          <button className="icon-btn" aria-label="Search">
+          <Link to="/products" className="icon-btn" aria-label="Search">
             <Search size={22} />
-          </button>
-          <Link to="/login" className="icon-btn desktop-only" aria-label="Account">
+          </Link>
+          <Link to={isAuthenticated ? "/profile" : "/login"} className="icon-btn desktop-only" aria-label="Account">
             <User size={22} />
           </Link>
           <Link to="/cart" className="icon-btn cart-btn desktop-only" aria-label="Cart">
