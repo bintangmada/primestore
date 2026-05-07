@@ -7,8 +7,8 @@ const api = axios.create({
   },
 });
 
-export const getProducts = async (limit = 10, offset = 0) => {
-  const response = await api.get(`/products?limit=${limit}&offset=${offset}`);
+export const getProducts = async (params = {}) => {
+  const response = await api.get('/products', { params });
   return response.data;
 };
 
