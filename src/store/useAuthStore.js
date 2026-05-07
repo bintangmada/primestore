@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '../services/api';
 
+import useCartStore from './useCartStore';
+
 const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -17,7 +19,11 @@ const useAuthStore = create(
           set({ token: access_token, isAuthenticated: true });
           
           // Fetch profile immediately after login
-          await get().fetchProfile();
+          const userProfile = await get().fetchProfile();
+          if (userProfile) {
+            useCartStore.getState().switchUser(userProfile.id);
+          }
+          
           return true;
         } catch (error) {
           console.error('Login failed:', error);
@@ -40,21 +46,28 @@ const useAuthStore = create(
 
       fetchProfile: async () => {
         const { token } = get();
-        if (!token) return;
+        if (!token) return null;
 
         try {
           const response = await api.get('/auth/profile', {
             headers: { Authorization: `Bearer ${token}` }
           });
           set({ user: response.data });
+          
+          // Pastikan cart sinkron setelah refresh halaman
+          useCartStore.getState().switchUser(response.data.id);
+          
+          return response.data;
         } catch (error) {
           console.error('Fetch profile failed:', error);
           get().logout();
+          return null;
         }
       },
 
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });
+        useCartStore.getState().switchUser(null); // Kembali ke keranjang 'guest'
       },
 
       updateAvatar: async (avatarUrl) => {
